@@ -1,9 +1,26 @@
 <?php
 defined('SYSPATH') OR die('No direct access allowed.');
 
-class User_Controller extends SmartgwtController {
+class User_Controller extends MainController {
 
 	const ALLOW_PRODUCTION = TRUE;
+
+	function index(){
+		$user_orm = ORM::factory('user')->where('deleted', 0); 
+
+		foreach($user_orm->find_all() as $user){
+			$users[] = array(
+					'id' => $user->id,
+					'name' => $user->name,
+					'role_id' => $user->role_id,
+					'active' => $user->active,
+					);
+		}
+
+		$user_view = new View('user');
+		$user_view->set('users', $users);
+		$user_view->render(TRUE);
+	}
 
 	function fetch(){
 		$objects = array();

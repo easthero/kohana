@@ -8,6 +8,9 @@ class MainController_Core extends Controller {
 		if (!$this->session->get('username')){
 			header('Location: login');	
 		}
+
+		$this->username = $this->session->get('username');
+		$this->role_id = $this->session->get('role_id');
 	}
 }
 ?>
