@@ -18,7 +18,8 @@ $(document).ready (function(){
 <div id="wrap">
 
 <div id="head">
-<img src="assets/images/logo.png"></img>
+<p>banner</p>
+<!-- <img src="assets/images/logo.png"></img> -->
 <form action="login/out" method="post">
 <input type="submit" value="注销" />
 </form>

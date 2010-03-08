@@ -1,6 +1,13 @@
+<script type="text/javascript" src="assets/js/jquery.jeditable.mini.js"></script>
+<script type="text/javascript" src="assets/js/jquery.validate.js"></script> 
+<script type="text/javascript" src="assets/js/jquery.nyroModal.js"></script>
+<link type="text/css" href="assets/css/nyroModal.full.css" rel="stylesheet" /> 
 <script type="text/javascript">
 $(document).ready (function(){
 	$('#userinfo tr:odd').addClass('odd');
+
+	$('a.changepwd').nyroModal();
+
 });
 
 function changepassword(id){
@@ -20,14 +27,19 @@ function deluser(id){
 tr.odd {
 	background-color: #eee;
 }
+
+span.userinfo_column {
+	display:inline-block;
+}
 </style>
 
-<table border="1" id="userinfo">
-<tr>
-	<th>用户名</th>
-	<th>角色</th>
-	<th colspan="3">操作</th>
-</tr>
+
+<ul>
+<li>
+<span class="userinfo_column" style="width:20%";>用户名</span>
+<span class="userinfo_column" style="width:20%";>角色</span>
+<span class="userinfo_column" style="width:20%";>操作</span>
+</li>
 <?php
 foreach($users as $user){
 	switch($user['role_id']){
@@ -41,14 +53,21 @@ foreach($users as $user){
 		$role_name = "审计员";
 		break;
 	}
+?>
+<li>
+<span class="userinfo_column" style="width:20%;"><?php echo $user['name']; ?></span>
+<span class="userinfo_column" style="width:10%;"><?php echo $role_name; ?></span>
+<span class="userinfo_column" style="width:10%;">
+	<a href="user/changepwd/<?php echo $user['id']; ?>" class="changepwd" title="修改密码"><span class="ui-icon ui-icon-key"></span></a>
+</span>
+<span class="userinfo_column" style="width:10%;">
+	<a href="user/del/<?php echo $user['id']; ?>" class="del" title="删除用户"><span class="ui-icon ui-icon-trash"></span></a>
+</span>
+</li>
 
-	echo "<tr>";
-	echo "<td>" . $user['name'] . "</td>";
-	echo "<td>" . $role_name . "</td>";
-	echo "<td><a href='javascript:changepassword(" . $user['id'] . ")'>修改密码</a></td>";
-	echo "<td><a href='javascript:disableuser(" . $user['id'] . ")'>禁用用户</a></td>";
-	echo "<td><a href='javascript:deluser(" . $user['id'] . ")'>删除用户</a></td>";
-	echo "</tr>";
+<?php
 }
 ?>
-</table>
+</ul>
+
+

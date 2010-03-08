@@ -10,16 +10,49 @@ class User_Controller extends MainController {
 
 		foreach($user_orm->find_all() as $user){
 			$users[] = array(
-					'id' => $user->id,
-					'name' => $user->name,
-					'role_id' => $user->role_id,
-					'active' => $user->active,
-					);
+				'id' => $user->id,
+				'name' => $user->name,
+				'role_id' => $user->role_id,
+				'active' => $user->active,
+			);
 		}
 
 		$user_view = new View('user');
 		$user_view->set('users', $users);
 		$user_view->render(TRUE);
+	}
+
+	function changepwd($id = FALSE){
+		if(isset($_POST['id']) && isset($_POST['password']) && isset($_POST['repeatedpassword'])){
+			if($_POST['password'] != $_POST['repeatedpassword']){
+				$message = "两次密码输入不相同，请重新输入";
+				respFailed($message);
+			}else{
+				$user_orm = ORM::factory('user')->where('id', $_POST['id'])->find();
+				if($user_orm->loaded){
+					$user_orm->password = sha1($_POST['password']);
+					$user_orm->save();
+
+					if($user_orm->saved){
+						respOk(array());
+					}else{
+						$message = "修改密码失败，数据库操作错误";
+						respFailed($message);
+					}
+				}else{
+					$message ="修改密码失败，不存在的用户ID";
+					respFailed($message);
+				}
+			}
+		}else{
+			$this->changepwd_render($id);
+		}
+	}
+
+	public function changepwd_render($id){
+		$changepwd_view = new View('changepwd');
+		$changepwd_view->set('id', $id);
+		$changepwd_view->render(TRUE);
 	}
 
 	function fetch(){
@@ -42,13 +75,13 @@ class User_Controller extends MainController {
 
 		foreach($objects as $object){
 			$user_data = array(
-					'id' => $object->id,
-					'name' => $object->name,
-					'role_id' => $object->role_id,
-					//					'restrict_ip' => $object->restrict_ip,
-					//					'permited_ip' => $object->permited_ip,
-					'active' => $object->active,
-					);
+				'id' => $object->id,
+				'name' => $object->name,
+				'role_id' => $object->role_id,
+				//					'restrict_ip' => $object->restrict_ip,
+				//					'permited_ip' => $object->permited_ip,
+				'active' => $object->active,
+			);
 			if($object->new_password !== ''){
 				$data[] = array_merge($user_data,array('review' => 1));
 			}else{
@@ -161,34 +194,34 @@ class User_Controller extends MainController {
 		return;
 	}
 
-	function changepwd(){		
-		$user_orm = ORM::factory('user')->where(array('name' => $this->session->get('username') , 'password' => sha1($this->req->data->old_password)))->find();
-
-		$return_data = array('name',$this->session->get('username'));		
-
-		if($user_orm->loaded){
-			$id = $user_orm->id;
-			$user_orm->password = sha1($this->req->data->new_password);		
-			$user_orm->save();
-
-			if($user_orm->saved){
-				$this->respOk($return_data);
-				$result = 0;
-				$message = "修改密码成功";
-			}else{
-				$result = -1;
-				$message = "修改密码失败,未知的原因";
-				$this->respFailed($message);
-			}
-			$this->operationlog_misc($result,$id,$this->session->get('username'),$message);
-		}else{
-			$message = '密码不正确，请重新输入';
-			$data = array_merge($return_data,array('status',-5));		
-			$this->respOK($data);
-		}
-
-		return;	
-	}
+	#	function changepwd(){		
+	#		$user_orm = ORM::factory('user')->where(array('name' => $this->session->get('username') , 'password' => sha1($this->req->data->old_password)))->find();
+	#
+	#		$return_data = array('name',$this->session->get('username'));		
+	#
+	#		if($user_orm->loaded){
+	#			$id = $user_orm->id;
+	#			$user_orm->password = sha1($this->req->data->new_password);		
+	#			$user_orm->save();
+	#
+	#			if($user_orm->saved){
+	#				$this->respOk($return_data);
+	#				$result = 0;
+	#				$message = "修改密码成功";
+	#			}else{
+	#				$result = -1;
+	#				$message = "修改密码失败,未知的原因";
+	#				$this->respFailed($message);
+	#			}
+	#			$this->operationlog_misc($result,$id,$this->session->get('username'),$message);
+	#		}else{
+	#			$message = '密码不正确，请重新输入';
+	#			$data = array_merge($return_data,array('status',-5));		
+	#			$this->respOK($data);
+	#		}
+	#
+	#		return;	
+	#	}
 
 	function enable(){
 		$user_orm = ORM::factory('user')->where('id',$this->req->data->id)->find();
